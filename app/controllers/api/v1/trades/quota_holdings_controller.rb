@@ -1,4 +1,4 @@
-class Api::V1::Trades::QuotaHoldingsController < ApplicationController
+class Api::V1::Trades::QuotaHoldingsController < Api::ApplicationController
   
   def index
     
@@ -13,7 +13,7 @@ class Api::V1::Trades::QuotaHoldingsController < ApplicationController
   
   def trade_accepted(trade)
     respond_to do |f|
-      f.json
+      f.json { render 'create', :status => :accepted, :location => api_v1_trades_quota_holding_path(@trade.order) }
     end
   end
   

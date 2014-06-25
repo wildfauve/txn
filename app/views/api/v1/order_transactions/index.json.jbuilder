@@ -5,6 +5,7 @@ json.order_transactions @orders do |order|
   json.state order.state
   json.type order.order_type
   json.stock do
+    json.concept_id order.stock.ref_id
     json.symbol order.stock.symbol
     json.qty order.stock_qty
   end

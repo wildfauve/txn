@@ -38,6 +38,7 @@ group :development do
   gem 'binding_of_caller'  
   gem 'meta_request'
   gem 'pry'
+  gem 'railroady'
 end
 
 # Use ActiveModel has_secure_password

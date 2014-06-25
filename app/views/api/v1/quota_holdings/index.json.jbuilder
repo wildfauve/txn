@@ -7,9 +7,9 @@ json.holdings @account.stock_holdings do |h|
 end
 json._links do
   json.self do 
-    json.href quota_holdings_api_v1_account_path(@account)
+    json.href quota_holdings_api_v1_transaction_account_path(@account)
   end
   json.order_transactions do 
-    json.href api_v1_account_order_transactions_path(@account)
+    json.href api_v1_transaction_account_order_transactions_path(@account)
   end  
 end

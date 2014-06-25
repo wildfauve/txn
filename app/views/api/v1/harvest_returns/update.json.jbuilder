@@ -1,0 +1,1 @@
+json.partial! 'harvest', harvest: @returns_mgr.harvest

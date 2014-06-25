@@ -14,6 +14,4 @@ class TradingManager
     publish(:trade_accepted, order)          
   end
   
-  
-  
 end

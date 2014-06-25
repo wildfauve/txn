@@ -7,7 +7,7 @@ Txn::Application.routes.draw do
       end
     
 
-      resources :accounts do
+      resources :transaction_accounts do
         collection do
           resources :quota_holdings, only: [:index]
         end
@@ -16,6 +16,12 @@ Txn::Application.routes.draw do
         end
         resources :order_transactions
       end
+      resources :harvest_returns do
+        member do
+          put 'completion'
+        end
+      end
+      
     end
   end  
 

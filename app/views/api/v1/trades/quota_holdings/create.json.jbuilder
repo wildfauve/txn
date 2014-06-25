@@ -10,7 +10,7 @@ json.timestamps do
   end
 end
 json.stock do
-  json.uuid @trade.order.stock.ref_id
+  json.concept_id @trade.order.stock.ref_id
   json.symbol @trade.order.stock.symbol
   json.ordered_qty @trade.order.stock_qty
 end

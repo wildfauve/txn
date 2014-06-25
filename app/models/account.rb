@@ -8,6 +8,11 @@ class Account
 
   embeds_many :stock_holdings
   
+  has_many :harvest_returns
+  
+  def self.get_by_client_number(client_number: nil)
+    self.where(client_number: client_number).first
+  end
   
   def add_to_holdings(stock: nil, qty: nil)
     holding = get_holding(stock: stock)
@@ -23,6 +28,13 @@ class Account
       self.stock_holdings << holding
     end
     holding
+  end
+  
+  def initialise_harvest_return(period: nil)
+    hr = HarvestReturn.initialise_empty_return(period: period, account: @account)
+    self.harvest_returns << hr 
+    self.save
+    hr
   end
   
 end
