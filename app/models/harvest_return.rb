@@ -29,5 +29,11 @@ class HarvestReturn
     end
     save
   end
+  
+  def set_complete
+    self.state = :completed
+    self.timestamps << Timestamp.new_state(state: self.state, name: :completed_time)
+    save
+  end
 
 end

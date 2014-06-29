@@ -21,15 +21,23 @@ class Api::V1::HarvestReturnsController < Api::ApplicationController
   def returns_saved(returns_mgr)
     @returns_mgr = returns_mgr
     respond_to do |f|
-      f.json
+      f.json {render 'update', status: :ok, location: api_v1_harvest_return_path(@returns_mgr.harvest)}
     end
   end
 
   def returns_listed(returns_mgr)
     @returns_mgr = returns_mgr    
     respond_to do |f|
-      f.json
+      f.json {render 'index', status: :ok, location: api_v1_harvest_returns_path}
     end
+  end
+  
+  def completed_return(returns_mgr)
+    @returns_mgr = returns_mgr
+    respond_to do |f|
+      f.json {render 'completion', status: :ok, location: api_v1_harvest_return_path(@returns_mgr.harvest)}
+    end
+    
   end
   
   

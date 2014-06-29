@@ -26,7 +26,8 @@ class ReturnsManager
   end
   
   def complete_return
-    binding.pry
+    @harvest.set_complete
+    publish(:completed_return, self)      
   end
   
   def initialise_gaps(current_returns)
@@ -38,7 +39,6 @@ class ReturnsManager
       raise
     else
     end
-      
     current_returns
   end
   

@@ -17,6 +17,6 @@ json.order_transactions @orders do |order|
 end
 json._links do
   json.self do 
-    json.href api_v1_account_order_transactions_url(@account)
+    json.href quota_holdings_api_v1_transaction_account_url(@account)
   end
 end
