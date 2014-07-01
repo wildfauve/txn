@@ -7,9 +7,16 @@ class Api::V1::Trades::QuotaHoldingsController < Api::ApplicationController
   def create
     @trade = TradingManager.new(params[:quota_holding])
     @trade.add_subscriber(self)        
-    @trade.assign_quota
+    @trade.execute
   end
   
+  
+  def show
+    @trade = TradingManager.get_trade_status(trade_id: params[:id])
+    respond_to do |f|
+      f.json { render 'show' }
+    end    
+  end
   
   def trade_accepted(trade)
     respond_to do |f|

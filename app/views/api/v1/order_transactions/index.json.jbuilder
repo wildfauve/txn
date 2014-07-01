@@ -4,10 +4,12 @@ end
 json.order_transactions @orders do |order|
   json.state order.state
   json.type order.order_type
-  json.stock do
-    json.concept_id order.stock.ref_id
-    json.symbol order.stock.symbol
-    json.qty order.stock_qty
+  json.txn_type order.txn_for(@account).type
+
+  json.stocks order.stock_entries do |ent|
+    json.concept_id ent.stock_concept.ref_id
+    json.symbol ent.stock_concept.symbol
+    json.ordered_qty ent.stock_qty
   end
   json.timestamps do
     order.timestamps.each do |ts|

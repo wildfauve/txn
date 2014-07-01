@@ -1,5 +1,9 @@
 class Transaction
   
+  TXN_OP = {buy: :add_to_holdings, sell: :remove_from_holdings}
+  
+  attr_accessor :acct
+  
   include Mongoid::Document
   include Mongoid::Timestamps
   
@@ -18,18 +22,16 @@ class Transaction
   end
   
   def execute
-    self.send(self.type)
-  end
-  
-  def buy
-    buy_txn = self.account.add_to_holdings(stock: self.order.stock, qty: self.order.stock_qty)
-    if buy_txn
+    #self.send(self.type)
+    @acct = self.account.send(TXN_OP[self.type], stocks: self.order.stock_entries)
+    if @acct.valid?
       self.state = :performed
     else
       self.state = :failed
-    end
-    
+    end 
+    self       
   end
+  
   
   def account
     Account.find(self.account_id)

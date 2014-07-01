@@ -8,9 +8,9 @@ class StockHolding
   
   embedded_in :account
     
-  def self.create_holding(stock: nil)
+  def self.create_holding(stock_entry: nil)
     h = self.new
-    h.stock_symbol = stock.symbol
+    h.stock_symbol = stock_entry.stock_concept.symbol
     h.qty = 0
     h
   end
@@ -19,6 +19,10 @@ class StockHolding
     self.qty += qty
     self
   end
-    
   
+  def remove(qty: nil)
+    self.qty -= qty
+    self
+  end
+    
 end

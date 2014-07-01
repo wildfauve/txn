@@ -5,6 +5,16 @@
 
 # Example:
 #
+# start cron jobs
+# whenever --update-crontab fish-txn
+# 
+# Remove cron jobs
+# whenever -c fish-txn
+#
+# Check status of Cron
+# crontab -l
+
+
 set :environment, 'development'
 set :output, "/Users/wildfauve/apps/fish/txn/log/cron_log.log"
 #
