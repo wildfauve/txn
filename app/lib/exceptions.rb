@@ -1,7 +1,7 @@
 module Exceptions
   
-  class Standard < StandardError 
-    attr :errorcode
+  class FishError < StandardError 
+    attr :errorcode, :model
     
     def intialize
       @errorcode = 1000
@@ -9,15 +9,29 @@ module Exceptions
   
   end
   
-  class NoAccountFound < Standard
+  class TradesError < FishError
+  end
+  
+  class NoAccountFound < TradesError
     
-    def initialize(model)
+    def initialize
       @errorcode = 1001
-      @model = model
     end
     
     def message
       "No Account could be found for the Trade"
+    end
+  end
+
+  class InvalidStock < TradesError
+    
+    def initialize(stock)
+      @stock = stock
+      @errorcode = 1001
+    end
+    
+    def message
+      "Traded Stock symbol #{@stock.stock_params["symbol"]} is not known"
     end
   end
   

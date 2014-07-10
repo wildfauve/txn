@@ -29,9 +29,19 @@ class TradingManager
   
   def perform
     @order = Order.create(@trade)
-    @order.execute_trade
-    @order.save_everything
-    publish(:trade_accepted, order)              
+    if @order.valid?
+      @order.execute_trade
+      @order.save_everything
+      publish(:trade_accepted, self)              
+    else
+      #rescue Exceptions::TradesError => e
+      #if !@order
+      #   @order = Order.create_failed_order(@trade)
+      #end   
+      #binding.pry
+      @order.set_failed_state      
+      publish(:trade_failed, self)                
+    end
   end
   
 end

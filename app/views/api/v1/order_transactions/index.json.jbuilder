@@ -4,7 +4,7 @@ end
 json.order_transactions @orders do |order|
   json.state order.state
   json.type order.order_type
-  json.txn_type order.txn_for(@account).type
+  json.txn_type order.txn_for(@account).try(:type) if order.completed?
 
   json.stocks order.stock_entries do |ent|
     json.concept_id ent.stock_concept.ref_id
@@ -16,6 +16,15 @@ json.order_transactions @orders do |order|
       json.set! ts.name, ts.timestamp
     end
   end
+  if order.failed?
+    json.status do
+      json.status_code order.errorcode
+      json.status_desc order.errormessage
+      json.messages do
+        
+      end
+    end
+  end  
 end
 json._links do
   json.self do 

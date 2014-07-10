@@ -5,9 +5,9 @@ class Api::V1::Trades::QuotaHoldingsController < Api::ApplicationController
   end
   
   def create
-    @trade = TradingManager.new(params[:quota_holding])
-    @trade.add_subscriber(self)        
-    @trade.execute
+    trade = TradingManager.new(params[:quota_holding])
+    trade.add_subscriber(self)        
+    trade.execute
   end
   
   
@@ -19,8 +19,16 @@ class Api::V1::Trades::QuotaHoldingsController < Api::ApplicationController
   end
   
   def trade_accepted(trade)
+    @trade = trade
     respond_to do |f|
-      f.json { render 'create', :status => :accepted, :location => api_v1_trades_quota_holding_path(@trade.order) }
+      f.json { render 'create', status: :accepted, location: api_v1_trades_quota_holding_path(@trade.order) }
+    end
+  end
+
+  def trade_failed(trade)
+    @trade = trade
+    respond_to do |f|
+      f.json { render 'create', status: :unprocessable_entity, location: api_v1_trades_quota_holding_path(@trade.order) }
     end
   end
   

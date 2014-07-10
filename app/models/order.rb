@@ -1,6 +1,6 @@
 class Order
   
-  attr_accessor :account
+  attr_accessor :account, :messages
   
   @@ORDER_TYPES = [:assign_quota]
   
@@ -12,6 +12,11 @@ class Order
   field :seller_client_number, type: String  
   field :order_type, type: Symbol
   field :state, type: Symbol
+  field :placer_id, type: String
+  field :placer_name, type: String
+  field :trade, type: Hash
+  field :errorcode, type: String
+  field :errormessage, type: String
 
   
   embeds_many :stock_entries
@@ -19,19 +24,45 @@ class Order
   embeds_many :transactions
   
   embeds_many :timestamps
+  
+  validate :accts_valid, on: :create
 
   
   def self.create(trade)
+    order = self.new.create_me(trade)
+    order  
+  end
+  
+  # TODO: Dont need this method
+  def self.create_failed_order(trade)
     order = self.new
     order.caller_uuid = trade[:caller_uuid]
     order.buyer_client_number = trade[:buyer_account][:client_number] if trade[:buyer_account]
     order.seller_client_number = trade[:seller_account][:client_number] if trade[:seller_account]
     order.order_type = trade[:order_type].to_sym
-    order.state = :placed
-    order.timestamps << Timestamp.new_state(state: order.state, name: :order_placed_time)
-    order.stock_entries << StockEntry.create_entries(stocks: trade[:stocks])
+    order.state = :failed
+    order.placer_id = trade[:placer][:party_id]
+    order.placer_name = trade[:placer][:party_name]    
+    order.timestamps << Timestamp.new_state(state: order.state, name: :order_failed_time)    
+    order.trade = trade
+    order.save
+    order
+  end
+  
+  def create_me(trade)
+    self.caller_uuid = trade[:caller_uuid]
+    self.buyer_client_number = trade[:buyer_account][:client_number] if trade[:buyer_account]
+    self.seller_client_number = trade[:seller_account][:client_number] if trade[:seller_account]
+    @buy_acct = find_account(client_number: self.buyer_client_number)
+    @sell_acct = find_account(client_number: self.seller_client_number)
+    self.order_type = trade[:order_type].to_sym
+    self.state = :placed
+    self.placer_id = trade[:placer][:party_id]
+    self.placer_name = trade[:placer][:party_name]    
+    self.timestamps << Timestamp.new_state(state: self.state, name: :order_placed_time)
+    self.stock_entries << StockEntry.create_entries(stocks: trade[:stocks])
     #order.save
-    order  
+    self
   end
   
   def self.get_orders(account: nil)
@@ -55,17 +86,18 @@ class Order
   end
   
   def transfer_quota
-    xfer = {}
-    xfer[:buy] = {account: find_account(client_number: self.buyer_client_number)}
-    xfer[:sell] = {account: find_account(client_number: self.seller_client_number)}    
-    raise Exceptions::NoAccountFound if !xfer[:buy][:account] || !xfer[:sell][:account]
-    xfer.each {|type, account| self.transactions << Transaction.create_txn(type: type, account: account[:account])}
+    if @buy_acct && @sell_acct      
+      xfer = {}
+      xfer[:buy] = {account: @buy_acct}
+      xfer[:sell] = {account: @sell_acct}
+      xfer.each {|type, account| self.transactions << Transaction.create_txn(type: type, account: account[:account])}
     
-    # TODO: Deal with errors on the buy and sell side
-    self.transactions.each {|txn| txn.execute }
+      # TODO: Deal with errors on the buy and sell side
+      self.transactions.each {|txn| txn.execute }
     
-    self.state = :complete
-    self.timestamps << Timestamp.new_state(state: self.state, name: :order_completed_time)    
+      self.state = :complete
+      self.timestamps << Timestamp.new_state(state: self.state, name: :order_completed_time)    
+    end
   end
   
   def find_account(client_number: nil)
@@ -73,13 +105,37 @@ class Order
   end
   
   def txn_for(account)
-    transactions.where(account_id: account.id).first
+    txn = transactions.where(account_id: account.id)
+    txn.empty? ? nil : txn.first
   end
   
   def save_everything
     self.transactions.each {|txn| txn.acct.save}
     self.save
     self
+  end
+  
+  def set_failed_state
+    self.state = :failed
+    self.timestamps << Timestamp.new_state(state: self.state, name: :order_failed_time)
+    @messages = errors.messages.dup
+    self.save(validate: false)
+    self
+  end
+  
+  def failed?
+    self.state == :failed
+  end
+  
+  def completed?
+    self.state == :complete
+  end
+  
+  private
+  
+  def accts_valid
+    errors.add(:buyer_client_number, "#{self.buyer_client_number} is not valid") if @buy_acct.nil? 
+    errors.add(:seller_client_number, "#{self.seller_client_number} is not valid") if @sell_acct.nil?      
   end
   
 end

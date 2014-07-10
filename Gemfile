@@ -31,6 +31,9 @@ gem 'whenever', require: false
 
 gem 'redis'
 
+gem 'flex-rails'
+gem 'rest-client'
+
 group :development do
   gem 'better_errors'
   gem 'binding_of_caller'  

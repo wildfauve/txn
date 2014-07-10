@@ -5,7 +5,7 @@ class Api::ApplicationController < ApplicationController
   
   rescue_from Mongoid::Errors::DocumentNotFound, with: :record_not_found
   rescue_from Mongoid::Errors::Validations, with: :invalid_request
-  rescue_from Exceptions::Standard, with: :custom_api_error
+  #rescue_from Exceptions::Standard, with: :custom_api_error
   
   respond_to :json
 
