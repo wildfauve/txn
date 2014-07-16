@@ -7,11 +7,13 @@ class Transaction
   include Mongoid::Document
   include Mongoid::Timestamps
   
+  
   field :state, type: Symbol
   field :type, type: Symbol
   field :account_id, type: BSON::ObjectId
   
   embedded_in :order
+  
   
   def self.create_txn(type: nil, account: nil)
     txn = self.new

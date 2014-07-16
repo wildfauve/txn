@@ -1,11 +1,13 @@
 class Order
-  
+    
   attr_accessor :account, :messages
   
   @@ORDER_TYPES = [:assign_quota]
   
   include Mongoid::Document
   include Mongoid::Timestamps
+  
+  include Flex::ModelIndexer
   
   field :caller_uuid, type: String
   field :buyer_client_number, type: String
@@ -26,6 +28,10 @@ class Order
   embeds_many :timestamps
   
   validate :accts_valid, on: :create
+  
+  flex.sync self
+  flex.index = "txn_order_#{Rails.env}"
+  flex.type = "order"
 
   
   def self.create(trade)
@@ -129,6 +135,49 @@ class Order
   
   def completed?
     self.state == :complete
+  end
+  
+  def flex_source
+    { 
+      order_type: order_type,
+      order_state: state,
+      timestamps: flex_timestamps,
+      stocks: flex_stocks,
+      transactions: flex_txns
+    }
+    
+  end
+  
+  def flex_timestamps
+    ti = {}
+    self.timestamps.each {|t| ti[t.name] = t.timestamp}
+    ti
+  end
+  
+  def flex_stocks
+    stks = []
+    self.stock_entries.each do |s|
+      stks << {
+        symbol: s.symbol,
+        qty: s.stock_qty,
+      }
+    end
+    stks    
+  end
+  
+  def flex_txns
+    txns = []
+    self.transactions.each do |t|
+      txns << {
+        type: t.type,
+        state: t.state,
+        account: {
+          client_number: t.account.client_number,
+          client_name: t.account.client_name
+        }
+      }
+    end
+    txns
   end
   
   private

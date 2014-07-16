@@ -31,7 +31,10 @@ gem 'whenever', require: false
 
 gem 'redis'
 
+gem 'patron'
+
 gem 'flex-rails'
+
 gem 'rest-client'
 
 group :development do
