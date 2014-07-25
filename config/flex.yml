@@ -16,4 +16,4 @@ txn_order_development:
     number_of_replicas: 1
 
   # add your custom mappings here
-  mappings: {}
+  mappings: 

@@ -37,11 +37,13 @@ gem 'flex-rails'
 
 gem 'rest-client'
 
+
 group :development do
   gem 'better_errors'
   gem 'binding_of_caller'  
   gem 'meta_request'
   gem 'pry'
+  gem 'pry-debugger'
   gem 'railroady'
 end
 
@@ -56,6 +58,13 @@ end
 
 # Use debugger
 # gem 'debugger', group: [:development, :test]
+
+group :test, :development do
+  gem 'rspec'
+  gem 'rspec-rails', '~> 3.0.0'
+  gem 'mongoid-rspec'    
+  gem "factory_girl_rails", "~> 4.0"
+end
 
 group :test do
   gem 'cucumber-rails', :require => false

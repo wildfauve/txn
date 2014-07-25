@@ -38,23 +38,7 @@ class Order
     order = self.new.create_me(trade)
     order  
   end
-  
-  # TODO: Dont need this method
-  def self.create_failed_order(trade)
-    order = self.new
-    order.caller_uuid = trade[:caller_uuid]
-    order.buyer_client_number = trade[:buyer_account][:client_number] if trade[:buyer_account]
-    order.seller_client_number = trade[:seller_account][:client_number] if trade[:seller_account]
-    order.order_type = trade[:order_type].to_sym
-    order.state = :failed
-    order.placer_id = trade[:placer][:party_id]
-    order.placer_name = trade[:placer][:party_name]    
-    order.timestamps << Timestamp.new_state(state: order.state, name: :order_failed_time)    
-    order.trade = trade
-    order.save
-    order
-  end
-  
+    
   def create_me(trade)
     self.caller_uuid = trade[:caller_uuid]
     self.buyer_client_number = trade[:buyer_account][:client_number] if trade[:buyer_account]

@@ -18,9 +18,9 @@
 set :environment, 'development'
 set :output, "/Users/wildfauve/apps/fish/txn/log/cron_log.log"
 #
-every 1.minute do
-  runner "CustomerEvent.check_for_events" 
-end
+#every 1.minute do
+#  runner "CustomerEvent.check_for_events" 
+#end
 #
 # every 4.days do
 #   runner "AnotherModel.prune_old_records"

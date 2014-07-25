@@ -28,30 +28,7 @@ json.stocks @trade.order.stock_entries do |ent|
   json.ordered_qty ent.stock_qty
 end
 if @trade.order.failed?
-  json.status do
-    json.status_code "txn_failed_trade"
-    json.status_desc "The trade has failed due to bad data"
-    json.messages do
-      if @trade.order.messages
-        json.order do
-          @trade.order.messages.each do |field, error|
-            json.set! field, error
-          end          
-        end
-      end
-      if @trade.order.stock_entries.any? {|e| e.errors.any?}
-        json.stocks do
-          @trade.order.stock_entries.each do |se|
-            if se.errors.any?
-              se.errors.messages.each do |field, error|
-                json.set! field, error
-              end
-            end
-          end
-        end
-      end
-    end    
-  end
+  json.partial! 'api/v1/shared/error', order: @trade.order
 end
 json._links do
   json.self do 

@@ -12,6 +12,7 @@ class TradingManager
   
   def initialize(params)
     params[:id] ? @order = Order.find(params[:id]) :  @trade = params
+    self
   end
   
   def execute
