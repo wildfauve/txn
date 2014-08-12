@@ -10,6 +10,12 @@ module Exceptions
   end
   
   class TradesError < FishError
+    @@domain = "Trading"
+    
+    def domain
+      @@domain
+    end
+    
   end
   
   class NoAccountFound < TradesError

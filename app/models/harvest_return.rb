@@ -24,8 +24,9 @@ class HarvestReturn
   def update_draft(draft: nil)
     self.timestamps << Timestamp.new_state(state: self.state, name: :updated_time)
     draft[:catches].each do |cat| 
-      ent = self.harvest_entries.where(stock_code: cat[:stock_code]).first
-      ent.nil? ? self.harvest_entries << HarvestEntry.create_entry(entry: cat) : ent.update_entry(entry: cat)
+      stock = Stock.get_by_symbol(symbol: cat[:stock_code])
+      ent = self.harvest_entries.where(stock_id: stock).first
+      ent.nil? ? self.harvest_entries << HarvestEntry.create_entry(entry: cat, stock: stock) : ent.update_entry(entry: cat)
     end
     save
   end

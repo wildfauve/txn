@@ -25,7 +25,7 @@ class Transaction
   
   def execute
     #self.send(self.type)
-    @acct = self.account.send(TXN_OP[self.type], stocks: self.order.stock_entries)
+    @acct = self.account.send(account_type: :share, TXN_OP[self.type], stocks: self.order.stock_entries)
     if @acct.valid?
       self.state = :performed
     else

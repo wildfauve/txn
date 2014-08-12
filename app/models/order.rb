@@ -55,9 +55,13 @@ class Order
     self
   end
   
-  def self.get_orders(account: nil)
-    self.or({buyer_client_number: account.client_number}, {seller_client_number: account.client_number})
-    #self.where(client_number: account.client_number).collect {|ord| ord.transactions.where(account_id: account.id) }.flatten
+  def self.get_orders(account: nil, query: nil)
+    orders = self.or({buyer_client_number: account.client_number}, {seller_client_number: account.client_number})
+    if query
+      orders.where('stock_entries.symbol' => query.to_sym)
+    else
+      orders
+    end
   end
   
   def execute_trade

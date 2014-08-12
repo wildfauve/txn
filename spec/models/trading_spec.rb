@@ -55,6 +55,7 @@ RSpec.describe TradingManager do
     end
   
     it 'should contain 2 stock entries' do
+      
     end
     
     it 'should have a stock entry for HOK1 of 100 units' do

@@ -8,4 +8,16 @@ class Stock
   
   has_many :orders
   
+  def self.get_by_symbol(symbol: nil)
+    sym = symbol.downcase.to_sym
+    stock = self.where(symbol: sym).first
+    stock ? stock : self.new.create_stock(symbol: sym) 
+  end
+  
+  def create_stock(symbol: nil)
+    self.symbol = symbol
+    self.save!
+    self
+  end
+  
 end

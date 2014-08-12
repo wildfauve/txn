@@ -1,6 +1,7 @@
 class TradingManager
 
-  include Publisher
+  #include Publisher
+  include Wisper::Publisher
   
   attr_accessor :order
   

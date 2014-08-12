@@ -7,7 +7,7 @@ json.timestamps do
 end
 json.state harvest.state
 json.catches harvest.harvest_entries do |ent|
-  json.stock_code ent.stock_code
+  json.stock_code ent.stock_symbol
   json.catch_qty do
     json.unit ent.unit
     json.qty ent.qty

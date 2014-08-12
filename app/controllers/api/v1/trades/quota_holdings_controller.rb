@@ -6,7 +6,7 @@ class Api::V1::Trades::QuotaHoldingsController < Api::ApplicationController
   
   def create
     trade = TradingManager.new(params[:quota_holding])
-    trade.add_subscriber(self)        
+    tradesubscribe(self)        
     trade.execute
   end
   

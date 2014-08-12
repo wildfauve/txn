@@ -25,6 +25,7 @@ gem 'sdoc', '~> 0.4.0',          group: :doc
 gem 'spring',        group: :development
 
 gem 'mongoid', github: 'mongoid/mongoid'
+
 gem 'wisper'
 
 gem 'whenever', require: false
@@ -36,6 +37,8 @@ gem 'patron'
 gem 'flex-rails'
 
 gem 'rest-client'
+
+gem 'money'
 
 
 group :development do

@@ -1,4 +1,4 @@
-class Account
+class Client
   
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -9,9 +9,7 @@ class Account
 
   embeds_many :stock_holdings
   
-  has_many :harvest_returns
-  
-  has_many :deemed_values
+  has_many :transaction_accounts
   
   def self.get_by_client_number(client_number: nil)
     self.where(client_number: client_number).first
@@ -22,7 +20,7 @@ class Account
     account.update({client_number: event["number"], client_name: event["name"], has_permit: event["permit"] })
   end
   
-  def add_to_holdings(stocks: nil)
+  def add_to_holdings(account_type: nil, stocks: nil)
     stocks.each do |stock_entry|
       holding = get_holding(stock_entry: stock_entry)
       holding.add(qty: stock_entry.stock_qty)

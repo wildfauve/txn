@@ -15,6 +15,7 @@ Txn::Application.routes.draw do
           get 'quota_holdings'
         end
         resources :order_transactions
+        resources :deemed_values
       end
       resources :harvest_returns do
         member do
