@@ -1,7 +1,7 @@
 json.account do
   json.client_number = @account.client_number
 end
-json.holdings @account.stock_holdings do |h|
+json.holdings @account.holdings do |h|
   json.stock_symbol h.stock_symbol
   json.qty h.qty
 end

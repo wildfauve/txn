@@ -183,10 +183,10 @@
           <div class="method-source-code" id="get_holding-source">
             <pre><span class="ruby-comment"># File app/models/account.rb, line 19</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">get_holding</span>(<span class="ruby-identifier">stock</span><span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>)
-  <span class="ruby-identifier">holding</span> = <span class="ruby-keyword">self</span>.<span class="ruby-identifier">stock_holdings</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">stock_symbol</span><span class="ruby-operator">:</span> <span class="ruby-identifier">stock</span>.<span class="ruby-identifier">symbol</span>).<span class="ruby-identifier">first</span>
+  <span class="ruby-identifier">holding</span> = <span class="ruby-keyword">self</span>.<span class="ruby-identifier">holdings</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">stock_symbol</span><span class="ruby-operator">:</span> <span class="ruby-identifier">stock</span>.<span class="ruby-identifier">symbol</span>).<span class="ruby-identifier">first</span>
   <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">holding</span>
     <span class="ruby-identifier">holding</span> = <span class="ruby-constant">StockHolding</span>.<span class="ruby-identifier">create_holding</span>(<span class="ruby-identifier">stock</span><span class="ruby-operator">:</span> <span class="ruby-identifier">stock</span>) <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">holding</span>
-    <span class="ruby-keyword">self</span>.<span class="ruby-identifier">stock_holdings</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">holding</span>
+    <span class="ruby-keyword">self</span>.<span class="ruby-identifier">holdings</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">holding</span>
   <span class="ruby-keyword">end</span>
   <span class="ruby-identifier">holding</span>
 <span class="ruby-keyword">end</span></pre>

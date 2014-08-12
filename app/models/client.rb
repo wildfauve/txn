@@ -7,7 +7,7 @@ class Client
   field :client_name, type: String
   field :has_permit, type: Boolean
 
-  embeds_many :stock_holdings
+  embeds_many :holdings
   
   has_many :transaction_accounts
   
@@ -50,10 +50,10 @@ class Client
   end
   
   def get_holding(stock_entry: nil)
-    holding = self.stock_holdings.where(stock_symbol: stock_entry.stock_concept.symbol).first
+    holding = self.holdings.where(stock_symbol: stock_entry.stock_concept.symbol).first
     if !holding
       holding = StockHolding.create_holding(stock_entry: stock_entry) if !holding
-      self.stock_holdings << holding
+      self.holdings << holding
     end
     holding
   end

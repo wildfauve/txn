@@ -1,17 +1,19 @@
-class StockHolding
+class Holding
   
   include Mongoid::Document
   include Mongoid::Timestamps
   
   field :stock_symbol, type: Symbol
   field :qty, type: Integer, default: 0
+  field :unit, type: Symbol
   
-  embedded_in :account
+  embedded_in :transaction_account
     
   def self.create_holding(stock_entry: nil)
     h = self.new
     h.stock_symbol = stock_entry.stock_concept.symbol
     h.qty = 0
+    h.unit = :share
     h
   end
   

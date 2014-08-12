@@ -43,8 +43,8 @@ class Order
     self.caller_uuid = trade[:caller_uuid]
     self.buyer_client_number = trade[:buyer_account][:client_number] if trade[:buyer_account]
     self.seller_client_number = trade[:seller_account][:client_number] if trade[:seller_account]
-    @buy_acct = find_account(client_number: self.buyer_client_number)
-    @sell_acct = find_account(client_number: self.seller_client_number)
+    @buy_acct = find_client(client_number: self.buyer_client_number)
+    @sell_acct = find_client(client_number: self.seller_client_number)
     self.order_type = trade[:order_type].to_sym
     self.state = :placed
     self.placer_id = trade[:placer][:party_id]
@@ -94,8 +94,8 @@ class Order
     end
   end
   
-  def find_account(client_number: nil)
-    Account.where(client_number: client_number).first
+  def find_client(client_number: nil)
+    Client.where(client_number: client_number).first
   end
   
   def txn_for(account)

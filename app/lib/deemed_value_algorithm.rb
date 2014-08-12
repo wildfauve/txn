@@ -18,7 +18,7 @@ catch through either leasing or buying the relevant quota.
   
   
   def execute(returns_mgr)
-    @holdings = returns_mgr.account.stock_holdings
+    @holdings = returns_mgr.account.holdings
     @harvests = returns_mgr.account.harvest_returns
     @account = returns_mgr.account
     determine_difference()

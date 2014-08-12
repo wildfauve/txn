@@ -1,28 +1,18 @@
-class Account
+class TransactionAccount
   
   include Mongoid::Document
   include Mongoid::Timestamps
   
-  field :client_number, type: String
-  field :client_name, type: String
-  field :has_permit, type: Boolean
+  field :type, type: Symbol
+  field :name, type: String
 
-  embeds_many :stock_holdings
+  embeds_many :holdings
   
   has_many :harvest_returns
   
   has_many :deemed_values
   
-  def self.get_by_client_number(client_number: nil)
-    self.where(client_number: client_number).first
-  end
-  
-  def self.create_by_event(event: nil)
-    account = self.new
-    account.update({client_number: event["number"], client_name: event["name"], has_permit: event["permit"] })
-  end
-  
-  def add_to_holdings(stocks: nil)
+  def add_to_holdings(account_type: nil, stocks: nil)
     stocks.each do |stock_entry|
       holding = get_holding(stock_entry: stock_entry)
       holding.add(qty: stock_entry.stock_qty)
@@ -52,10 +42,10 @@ class Account
   end
   
   def get_holding(stock_entry: nil)
-    holding = self.stock_holdings.where(stock_symbol: stock_entry.stock_concept.symbol).first
+    holding = self.holdings.where(stock_symbol: stock_entry.stock_concept.symbol).first
     if !holding
       holding = StockHolding.create_holding(stock_entry: stock_entry) if !holding
-      self.stock_holdings << holding
+      self.holdings << holding
     end
     holding
   end
