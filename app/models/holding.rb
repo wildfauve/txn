@@ -26,5 +26,9 @@ class Holding
     self.qty -= qty
     self
   end
+  
+  def stock
+    Stock.where(symbol: self.stock_symbol).first
+  end
     
 end

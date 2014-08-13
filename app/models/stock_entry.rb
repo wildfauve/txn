@@ -10,6 +10,7 @@ class StockEntry
   field :stock_qty, type: Integer
   field :stock_id, type: BSON::ObjectId
   field :symbol, type: Symbol
+  field :unit, type: Symbol
 
   validate :stock_valid, on: :create
   

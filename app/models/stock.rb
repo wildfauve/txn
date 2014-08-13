@@ -5,6 +5,8 @@ class Stock
   field :symbol, type: Symbol
   field :ref_id, type: String
   field :total_shares, type: Integer
+  field :unit, type: Symbol
+  field :fish_year_month, type: Integer 
   
   has_many :orders
   
@@ -16,6 +18,9 @@ class Stock
   
   def create_stock(symbol: nil)
     self.symbol = symbol
+    self.fish_year_month = 10
+    self.unit = :kg
+    self.total_shares = 100000000
     self.save!
     self
   end

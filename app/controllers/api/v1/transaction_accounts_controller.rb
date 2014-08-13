@@ -1,7 +1,7 @@
 class Api::V1::TransactionAccountsController < Api::ApplicationController
   
   def index
-    @accounts = Account.all
+    @clients = Client.all
     respond_to do |f|
       f.json
     end
@@ -9,7 +9,8 @@ class Api::V1::TransactionAccountsController < Api::ApplicationController
   end
   
   def quota_holdings
-    @account = Account.find(params[:id])
+    @client = Client.find(params[:id])
+    @account = @client.get_account_by_type(acct_type: :share)
     respond_to do |f|
       f.json {render '/api/v1/quota_holdings/index'}
     end

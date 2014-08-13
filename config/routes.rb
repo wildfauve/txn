@@ -10,6 +10,7 @@ Txn::Application.routes.draw do
       resources :transaction_accounts do
         collection do
           resources :quota_holdings, only: [:index]
+          resources :entitlements, only: [:index]
         end
         member do
           get 'quota_holdings'

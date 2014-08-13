@@ -29,9 +29,9 @@ class Order
   
   validate :accts_valid, on: :create
   
-  flex.sync self
-  flex.index = "txn_order_#{Rails.env}"
-  flex.type = "order"
+  #flex.sync self
+  #flex.index = "txn_order_#{Rails.env}"
+  #flex.type = "order"
 
   
   def self.create(trade)
@@ -42,13 +42,17 @@ class Order
   def create_me(trade)
     self.caller_uuid = trade[:caller_uuid]
     self.buyer_client_number = trade[:buyer_account][:client_number] if trade[:buyer_account]
-    self.seller_client_number = trade[:seller_account][:client_number] if trade[:seller_account]
-    @buy_acct = find_client(client_number: self.buyer_client_number)
-    @sell_acct = find_client(client_number: self.seller_client_number)
+    @buy_client = find_client(client_number: self.buyer_client_number)
+    if trade[:seller_account]
+      self.seller_client_number = trade[:seller_account][:client_number] if trade[:seller_account]
+      @sell_client = find_client(client_number: self.seller_client_number)      
+    end
     self.order_type = trade[:order_type].to_sym
     self.state = :placed
-    self.placer_id = trade[:placer][:party_id]
-    self.placer_name = trade[:placer][:party_name]    
+    if trade[:placer]
+      self.placer_id = trade[:placer][:party_id]
+      self.placer_name = trade[:placer][:party_name]    
+    end
     self.timestamps << Timestamp.new_state(state: self.state, name: :order_placed_time)
     self.stock_entries << StockEntry.create_entries(stocks: trade[:stocks])
     #order.save
@@ -69,9 +73,7 @@ class Order
   end
   
   def assign_quota
-    account = find_account(client_number: self.buyer_client_number)
-    raise Exceptions::NoAccountFound if !account
-    txn = Transaction.create_txn(type: :buy, account: account)
+    txn = Transaction.create_txn(type: :buy, client: @buy_client)
     self.transactions << txn
     txn.execute
     self.state = :complete
@@ -171,8 +173,8 @@ class Order
   private
   
   def accts_valid
-    errors.add(:buyer_client_number, "#{self.buyer_client_number} is not valid") if @buy_acct.nil? 
-    errors.add(:seller_client_number, "#{self.seller_client_number} is not valid") if @sell_acct.nil?      
+    errors.add(:buyer_client_number, "#{self.buyer_client_number} is not valid") if @buy_client.nil? 
+    errors.add(:seller_client_number, "#{self.seller_client_number} is not valid") if @sell_client.nil? && self.order_type != :assign_quota     
   end
   
 end

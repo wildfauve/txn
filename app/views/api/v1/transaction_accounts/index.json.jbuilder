@@ -1,5 +1,5 @@
 json.kind "transaction_accounts"
-json.accounts @accounts do |acct|
+json.accounts @clients do |acct|
   json.client_number acct.client_number
   json.client_name acct.client_name
   json._links do
