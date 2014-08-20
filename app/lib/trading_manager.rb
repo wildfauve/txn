@@ -29,6 +29,10 @@ class TradingManager
     self.perform
   end
   
+  def transfer_entitlements
+    self.perform
+  end
+  
   def perform
     @order = Order.create(@trade)
     if @order.valid?

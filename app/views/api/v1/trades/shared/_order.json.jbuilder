@@ -32,6 +32,10 @@ if @trade.order.failed?
 end
 json._links do
   json.self do 
-    json.href api_v1_trades_quota_holding_path(@trade.order)
+    if @trade.order.order_type == :entitlements_transfer
+      json.href api_v1_trades_entitlement_path(@trade.order)
+    else
+      json.href api_v1_trades_quota_holding_path(@trade.order)
+    end
   end
 end

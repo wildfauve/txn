@@ -23,14 +23,14 @@ class Client
   #  account.update({client_number: event["number"], client_name: event["name"], has_permit: event["permit"] })
   #end
   
-  def add_to_holdings(stocks: nil)
+  def add_to_holdings(stocks: nil, transaction: nil)
     acct = get_account_by_type(acct_type: :share)
     acct.add_to_holdings(stocks: stocks)
     #self.save
     acct
   end
   
-  def remove_from_holdings(stocks: nil)
+  def remove_from_holdings(stocks: nil, transaction: nil)
     stocks.each do |stock_entry|
       holding = get_holding(stock_entry: stock_entry)
       holding.remove(qty: stock_entry.stock_qty)
@@ -43,16 +43,24 @@ class Client
   def convert_quota_to_ace(entitlement_date: nil, entitle_algorithm: nil)
     entitle_stock = []
     get_account_by_type(acct_type: :share).holdings.each do |h|
-      entitle_stock << {stock_symbol: h.stock.symbol, units: h.stock.unit, fish_year_month: h.stock.fish_year_month,
-        entitle_qty: entitle_algorithm.execute(stock: h.stock, quota: h)
+      entitle_stock << {symbol: h.stock.symbol, unit: h.stock.unit, ordered_qty: entitle_algorithm.execute(stock: h.stock, quota: h)
       }
     end
-    add_to_entitlements(entitle_stock_units: entitle_stock, assign_date: entitlement_date)
+    add_to_entitlements(stocks: StockEntry.create_entries(stocks: entitle_stock), assign_date: entitlement_date, txn_op: :convert_quota)
   end
   
-  def add_to_entitlements(entitle_stock_units: nil, assign_date: nil)
+  def add_to_entitlements(stocks: nil, assign_date: nil, transaction: nil)
+    assign_date = Time.now if assign_date.nil? 
     acct = get_account_by_type(acct_type: :entitlement)
-    acct.add_to_entitlements(entitle_stock_units: entitle_stock_units, assign_date: assign_date)
+    acct.add_to_entitlements(entitle_stock_units: stocks, assign_date: assign_date, txn_op: :ace_transfer, transaction: transaction)
+    self
+  end
+  
+  def remove_from_entitlements(stocks: nil, assign_date: nil, transaction: nil)
+    assign_date = Time.now if assign_date.nil? 
+    acct = get_account_by_type(acct_type: :entitlement)
+    acct.remove_from_entitlements(entitle_stock_units: stocks, assign_date: assign_date, txn_op: :ace_transfer, transaction: transaction)
+    self
   end
   
   def update_by_event(event: nil)

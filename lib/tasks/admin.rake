@@ -10,13 +10,13 @@ namespace :admin do
   
   desc "Allocate ACE at Start of FY"
   task allocate_ace: :environment do
-    EntitlementManger.new.allocate_ace_at_period_start
+    EntitlementManager.new.allocate_ace_at_period_start
   end
   
   desc "Client Entitlement Positions for all Stock"
   task client_position: :environment do
     client = Client.first
-    entitle = client.entitlement_positions.on(Date.today - 1.years).for(:all)
+    entitle = client.entitlement_positions.on(Time.now - 1.years).for(:all)
     entitle.each do |stock|
       puts "Stock: #{stock[:stock_symbol]}  Qty: #{stock[:qty]}"
     end

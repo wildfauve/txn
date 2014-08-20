@@ -21,32 +21,43 @@ class TransactionAccount
     a
   end
   
-  
-  def add_to_holdings(stocks: nil)
-    stocks.each do |stock_entry|
-      holding = get_holding(stock_entry: stock_entry)
-      holding.add(qty: stock_entry.stock_qty)
-    end
-    self
+  def add_to_holding(stocks: nil)
+    execute_holding(holding_op: :add, stock: stocks)
   end
   
-  def remove_from_holdings(stocks: nil)
+  def remove_from_holding(stocks: nil)
+    execute_holding(holding_op: :remove, stock: stocks)    
+  end
+  
+  # TODO: Determine why add and remove are different
+  def execute_holdings(holding_op: nil, stocks: nil)
     stocks.each do |stock_entry|
       holding = get_holding(stock_entry: stock_entry)
-      holding.remove(qty: stock_entry.stock_qty)
+      holding.send(holding_op, qty: stock_entry.stock_qty)
     end
-    #self.save
-    self    
+    self
   end
   
   
   # [{:stock_symbol=>:hor9, :units=>:kg, :fish_year_month=>10, :entitle_qty=>10000},
   #  {:stock_symbol=>:kic1, :units=>:kg, :fish_year_month=>10, :entitle_qty=>3}]
-  def add_to_entitlements(entitle_stock_units: nil, assign_date: nil)
+  def add_to_entitlements(entitle_stock_units: nil, assign_date: nil, txn_op: nil, transaction: nil)
+    execute_entitlements_op(op_method: :add_op, entitle_stock_units: entitle_stock_units, 
+                            assign_date: assign_date, txn_op: txn_op, transaction: transaction)
+  end
+
+  def remove_from_entitlements(entitle_stock_units: nil, assign_date: nil, txn_op: nil, transaction: nil)
+    execute_entitlements_op(op_method: :remove_op, entitle_stock_units: entitle_stock_units, 
+                            assign_date: assign_date, txn_op: txn_op, transaction: transaction)
+  end
+
+  
+  def execute_entitlements_op(op_method: nil, entitle_stock_units: nil, assign_date: nil, txn_op: nil, transaction: nil)
     entitle_stock_units.each do |stock_unit|
-      period = determine_period(fish_year_month: stock_unit[:fish_year_month], on: Date.today)
+      period = determine_period(fish_year_month: stock_unit.fish_year_month, on: Date.today)
       entitle = get_entitlement(period: period)
-      entitle.add(stock_unit: stock_unit, assign_date: determine_assign_date(assign_date: assign_date, period: period))
+      entitle.send(op_method, stock_unit: stock_unit, txn_op: txn_op, transaction: transaction,
+                    assign_date: determine_assign_date(assign_date: assign_date, period: period))
       entitle.save
     end
     self.save
@@ -90,9 +101,9 @@ class TransactionAccount
   
   def determine_assign_date(assign_date: nil, period: nil)
     if assign_date == :start_of_period
-      return period
+      period
     else
-      raise
+      assign_date
     end
   end
   
@@ -101,19 +112,20 @@ class TransactionAccount
     Date.new(yr, fish_year_month, 1)
   end
   
-  def date_to_periods(date: nil)
+  # Get all Unique Period Start Dates based on all stocks. 
+  def date_to_periods(time: nil)
     periods = []
-    Stock.all.map(&:fish_year_month).uniq.each {|mth| periods << determine_period(fish_year_month: mth, on: date) }
+    Stock.all.map(&:fish_year_month).uniq.each {|mth| periods << determine_period(fish_year_month: mth, on: time) }
     periods
   end
   
-  def on(date)
+  def at(time)
     entitlements = []
-    date_to_periods(date: date).each do |period| 
+    date_to_periods(time: time).each do |period| 
       entitle = get_entitlement(period: period, create: false)
       entitlements << entitle unless entitle.nil?
     end
-    Entitlement.set_query_base(instances: entitlements)
+    Entitlement.set_query_base(instances: entitlements, on_time: time)
   end
     
 end

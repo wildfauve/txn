@@ -73,27 +73,34 @@ class Order
   end
   
   def assign_quota
-    txn = Transaction.create_txn(type: :buy, client: @buy_client)
+    txn = Transaction.create_txn(type: :buy, order_type: self.order_type, client: @buy_client)
     self.transactions << txn
-    txn.execute
+    txn.execute(stocks: self.stock_entries)
     self.state = :complete
     self.timestamps << Timestamp.new_state(state: self.state, name: :order_completed_time)      
     #self.save
   end
   
-  def transfer_quota
-    if @buy_acct && @sell_acct      
-      xfer = {}
-      xfer[:buy] = {account: @buy_acct}
-      xfer[:sell] = {account: @sell_acct}
-      xfer.each {|type, account| self.transactions << Transaction.create_txn(type: type, account: account[:account])}
-    
-      # TODO: Deal with errors on the buy and sell side
-      self.transactions.each {|txn| txn.execute }
-    
-      self.state = :complete
-      self.timestamps << Timestamp.new_state(state: self.state, name: :order_completed_time)    
-    end
+  def transfer_entitlements
+    perform_transfer()
+  end
+
+  def quota_transfer
+    perform_transfer()
+  end
+  
+  
+  def perform_transfer
+    xfer = {}
+    xfer[:buy] = {client: @buy_client}
+    xfer[:sell] = {client: @sell_client}
+    xfer.each {|type, client| self.transactions << Transaction.create_txn(type: type, order_type: self.order_type, client: client[:client])}
+  
+    # TODO: Deal with errors on the buy and sell side
+    self.transactions.each {|txn| txn.execute(stocks: self.stock_entries) }
+  
+    self.state = :complete
+    self.timestamps << Timestamp.new_state(state: self.state, name: :order_completed_time)    
   end
   
   def find_client(client_number: nil)

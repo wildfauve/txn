@@ -7,7 +7,7 @@ json.order_transactions @orders do |order|
   json.type order.order_type
   json.txn_type order.txn_for(@account).try(:type) if order.completed?
   json.transactions order.transactions do |t|
-    json.account_id t.account.client_number
+    json.account_id t.client.client_number
     json.type t.type
     json.state t.state
   end

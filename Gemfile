@@ -46,7 +46,7 @@ group :development do
   gem 'binding_of_caller'  
   gem 'meta_request'
   gem 'pry'
-  gem 'pry-debugger'
+  #gem 'pry-debugger'
   gem 'railroady'
 end
 

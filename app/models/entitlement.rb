@@ -15,8 +15,10 @@ class Entitlement
     e
   end
   
-  def self.set_query_base(instances: nil)
+  # Set the instances of Entitlement that will be queried in the self.for method
+  def self.set_query_base(instances: nil, on_time: nil)
     @entitlements = instances
+    @on_time = on_time
     self
   end
   
@@ -25,18 +27,33 @@ class Entitlement
       if params == :all
         allocs = []
         @entitlements.each do |entitle|
-          entitle.allocations.each {|al| allocs << al}
+          entitle.allocations.lte(assigned_time: @on_time).each {|al| allocs << al}
         end
+      else
+        raise
       end
     end
     allocs
   end
   
-  def add(stock_unit: nil, assign_date: nil)
-    self.allocations << Allocation.add_stock_allocation(stock_unit: stock_unit, assign_date: assign_date)
+  def add_op(stock_unit: nil, assign_date: nil, txn_op: nil, transaction: nil)
+    target_stock = get_target(symbol: stock_unit.symbol)
+    target_stock ? balance = target_stock.balance + stock_unit.stock_qty : balance = stock_unit.stock_qty
+    self.allocations << Allocation.add_stock_allocation(stock_unit: stock_unit, assign_date: assign_date, new_balance: balance, txn_op: txn_op, transaction: transaction)
     self    
   end
   
+  def remove_op(stock_unit: nil, txn_op: nil, assign_date: nil, transaction: nil)
+    target_stock = get_target(symbol: stock_unit.symbol)
+    target_stock ? balance = target_stock.balance - stock_unit.stock_qty : balance = stock_unit.stock_qty
+    self.allocations << Allocation.remove_stock_allocation(stock_unit: stock_unit, assign_date: assign_date, new_balance: balance, txn_op: txn_op, transaction: transaction)
+    self    
+  end
+  
+  
+  def get_target(symbol: nil)
+    target = self.allocations.where(stock_symbol: symbol).asc(:assigned_time).try(:first)
+  end
   
   
 end

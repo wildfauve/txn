@@ -4,6 +4,7 @@ Txn::Application.routes.draw do
     namespace :v1 do
       namespace :trades do
         resources :quota_holdings
+        resources :entitlements
       end
     
 
@@ -17,6 +18,7 @@ Txn::Application.routes.draw do
         end
         resources :order_transactions
         resources :deemed_values
+        resources :entitlements
       end
       resources :harvest_returns do
         member do
